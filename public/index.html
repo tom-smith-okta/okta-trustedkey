@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+	<meta charset='utf-8' />
+	<meta name='viewport' content='width=device-width, initial-scale=1' />
+
+	<title>Okta simple authentication: authorize uri</title>
+
+	<link rel="shortcut icon" href="https://www.okta.com/sites/all/themes/developer/favicon.ico" type="image/vnd.microsoft.icon" />
+
+	<script
+	  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.6.0/js/okta-sign-in.min.js"
+	  type="text/javascript"></script>
+
+	<link
+	  href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.6.0/css/okta-sign-in.min.css"
+	  type="text/css"
+	  rel="stylesheet"/>
+
+	<!-- Theme file: Customize or replace this file if you want to override our default styles -->
+	<link
+	  href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.6.0/css/okta-theme.css"
+	  type="text/css"
+	  rel="stylesheet"/>
+
+	<!-- include jquery just for some simple UI elements -->
+	<script
+	  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+	  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+	  crossorigin="anonymous"></script>
+
+	<script>
+
+	/***************************************************************************/
+	// BASIC REQUIREMENT: UPDATE THIS EXAMPLE VALUE WITH YOUR OWN VALUE
+
+	// okta tenant
+	var baseUrl = "https://trustedkey.oktapreview.com"
+
+	/***************************************************************************/
+
+	var params = {}
+
+	// external idp (outside okta)
+	// leave blank if you are just authenticating directly against okta
+	params.idp = ""
+	params.client_id = "0oah3438yvWWsk1sH0h7"
+	params.response_type = "id_token"
+	params.response_mode = "fragment"
+	params.scope = "openid"
+	params.redirect_uri = "http://localhost:4512/okta-trustedkey"
+	params.state = "some_state"
+	params.nonce = "some_nonce"
+
+	var authorize_uri = get_authorize_uri(params)
+
+	function get_authorize_uri(params) {
+		var authorize_uri = baseUrl + "/oauth2/v1/authorize?"
+
+		var first_param = true
+
+		for (var k in params) {
+			var v = params[k]
+
+			if (v != "") {
+				if (first_param) { first_param = false }
+				else { authorize_uri += "&" }
+				authorize_uri += k + "=" + v
+			}
+		}
+		return authorize_uri
+	}
+
+	console.log("the authorize uri is: " + authorize_uri)
+
+	// external IDP
+	// var authorize_uri = "https://trustedkey.oktapreview.com/oauth2/v1/authorize?idp=0oah35cb7sJD7Pjpr0h7&client_id={clientId}&response_type={responseType}&response_mode={responseMode}&scope={scopes}&redirect_uri={redirectUri}&state={state}&nonce={nonce}"
+	/***************************************************************************/
+
+	var signIn = new OktaSignIn({
+		baseUrl: baseUrl
+	});
+
+	window.onload = function() {
+
+		signIn.session.get(function (res) {
+			// Session exists, show logged in state.
+			if (res.status === 'ACTIVE') {
+				console.log("User has an Okta session.")
+				console.dir(res)
+				var welcome_msg = "<h3>Welcome, " + res.login + "!</h3>"
+				var signout_msg = "<a href = '#' onclick='logout()'>Log out</a>"
+				$("#welcome").html(welcome_msg + signout_msg)
+			}
+			// No session, or error retrieving the session. Render the Sign-In Widget.
+			else if (res.status === 'INACTIVE') {
+
+				$("#sign-in-link").html("<a href='" + authorize_uri + "'>" + authorize_uri + "</a>")
+				$("#authorize_uri").html(authorize_uri)
+
+			}
+		});
+	}
+
+	function logout() {
+		signIn.session.close(function (err) {
+			window.location.reload(true);
+		});
+	}
+
+	</script>
+
+</head>
+
+<body style = "text-align: center">
+
+	<div>
+		<p id="sign-in-link"></p>
+		<p id="authorize_uri"></p>
+	</div>
+
+	<div id="welcome"></div>
+
+</body>
+
+</html>
