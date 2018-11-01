@@ -5,7 +5,7 @@
 	<meta charset='utf-8' />
 	<meta name='viewport' content='width=device-width, initial-scale=1' />
 
-	<title>Okta simple authentication: authorize uri</title>
+	<title>Okta + TrustedKey</title>
 
 	<link rel="shortcut icon" href="https://www.okta.com/sites/all/themes/developer/favicon.ico" type="image/vnd.microsoft.icon" />
 
@@ -49,7 +49,7 @@
 	params.response_type = "id_token"
 	params.response_mode = "fragment"
 	params.scope = "openid"
-	params.redirect_uri = "http://localhost:4512/okta-trustedkey"
+	params.redirect_uri = "http://localhost:4512/"
 	params.state = "some_state"
 	params.nonce = "some_nonce"
 
@@ -78,6 +78,15 @@
 	// var authorize_uri = "https://trustedkey.oktapreview.com/oauth2/v1/authorize?idp=0oah35cb7sJD7Pjpr0h7&client_id={clientId}&response_type={responseType}&response_mode={responseMode}&scope={scopes}&redirect_uri={redirectUri}&state={state}&nonce={nonce}"
 	/***************************************************************************/
 
+	params.idp = "0oah35cb7sJD7Pjpr0h7" // TrustedKey
+	params.scope = "openid+profile+email"
+	params.redirect_uri = "https://trustedkey.oktapreview.com"
+
+	var trusted_key_uri = get_authorize_uri(params)
+
+
+	/***************************************************************************/
+
 	var signIn = new OktaSignIn({
 		baseUrl: baseUrl
 	});
@@ -99,6 +108,8 @@
 				$("#sign-in-link").html("<a href='" + authorize_uri + "'>" + authorize_uri + "</a>")
 				$("#authorize_uri").html(authorize_uri)
 
+				$("#tk_sign-in-link").html("<a href='" + trusted_key_uri + "'>" + trusted_key_uri + "</a>")
+				$("#tk_authorize_uri").html(trusted_key_uri)
 			}
 		});
 	}
@@ -115,9 +126,19 @@
 
 <body style = "text-align: center">
 
-	<div>
+	<div id="regular_auth">
+		<h1>regular auth</h1>
 		<p id="sign-in-link"></p>
 		<p id="authorize_uri"></p>
+
+	</div>
+
+<hr>
+
+	<div id="trusted_key_auth">
+		<h1>trustedkey auth</h1>
+		<p id="tk_sign-in-link"></p>
+		<p id="tk_authorize_uri"></p>
 	</div>
 
 	<div id="welcome"></div>

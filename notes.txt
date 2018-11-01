@@ -1,0 +1,40 @@
+http://localhost:4512/#state=some_state&error=access_denied&error_description=User+canceled+the+social+login+request.
+
+-- this error message does not make any sense
+
+-- changed scope to openid+profile+email
+
+-- changed redirec_uri to oktapreview and it works till I get to:
+
+https://trustedkey.oktapreview.com/state=some_state&error=access_denied&error_description=Unable+to+process+the+username+transform.
+
+-- I think this means that the username already exists.
+
+-- I changed my existing user tom.smith@okta.com -> tom.smith@oktademo.com
+
+-- Added profile and email scopes to the IDP setup in Okta
+
+https://trustedkey.oktapreview.com/state=some_state&error=jit_failure&error_description=Unable+to+JIT+the+user.
+
+-- Added given_name and family_name in the scopes to the IDP setup in okta
+^^^^^^did not need to do this, removed^^^^^^^^^
+
+https://trustedkey.oktapreview.com/state=some_state&error=jit_failure&error_description=Unable+to+JIT+the+user.
+
+-- According to Okta, JIT was failing bc I did not have fn and LN.
+
+-- I scanned my drivers license and therefore added fn and ln to my profile
+
+It works!
+
+https://trustedkey.oktapreview.com/login/signout?fromURI=%2Fapp%2FUserHome&message=You+were+signed+out+because+your+session+timed+out.
+
+
+--------------------------------------------------------------
+
+not clear what the relationship is between the IDP redirect_uri and the client app redirect_uri
+
+--------------------------------------------------------------
+
+
+You can try here: https://dev-191945.oktapreview.com/oauth2/v1/authorize?idp=0oagjofmhwTAO7EX30h7&client_id=0oagjlu8n8y2e7A2p0h7&response_type=code&scope=openid+profile+email&redirect_uri=https://dev-191945-admin.oktapreview.com&state=ADFTG3
