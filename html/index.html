@@ -59,7 +59,18 @@
 	params.state = "some_state"
 	params.nonce = "some_nonce"
 
-	var trusted_key_uri = get_authorize_uri(params)
+	var trusted_key_reg_uri = get_authorize_uri(params)
+
+	params.idp = "0oah6eoqqsCX6Rfwi0h7" // TrustedKey authn
+	params.client_id = "0oah3438yvWWsk1sH0h7"
+	params.response_type = "id_token"
+	params.response_mode = "fragment"
+	params.scope = "openid"
+	params.redirect_uri = "{{REDIRECT_URI}}"
+	params.state = "some_state"
+	params.nonce = "some_nonce"
+
+	var trusted_key_authn_uri = get_authn_uri(params)
 
 	function get_authorize_uri(params) {
 		var authorize_uri = baseUrl + "/oauth2/v1/authorize?"
@@ -101,9 +112,14 @@
 			else if (res.status === 'INACTIVE') {
 				console.log("The user does not have an Okta session.")
 
-				$("#tk_sign-in-link").html("<a href='" + trusted_key_uri + "'>" + trusted_key_uri + "</a>")
-				$("#tk_authorize_uri").html(trusted_key_uri)
-				$("#login_button").html('<a class="btn btn-primary" href="' + trusted_key_uri + '" role="button">log in</a>')
+				$("#tk_register-link").html("<p>register: <a href='" + trusted_key_reg_uri + "'>" + trusted_key_reg_uri + "</a></p>")
+				$("#tk_register_uri").html(trusted_key_reg_uri)
+				$("#register_button").html('<a class="btn btn-primary" href="' + trusted_key_reg_uri + '" role="button">Register</a>')
+
+				$("#tk_sign-in-link").html("<p>login: <a href='" + trusted_key_authn_uri + "'>" + trusted_key_authn_uri + "</a></p>")
+				$("#tk_authorize_uri").html(trusted_key_authn_uri)
+				$("#login_button").html('<a class="btn btn-primary" href="' + trusted_key_authn_uri + '" role="button">log in</a>')
+
 			}
 		});
 	}
@@ -124,6 +140,8 @@
 		<div id="logo" style="margin:20px">
 			<img src = "https://s3.amazonaws.com/tom-smith-okta-demo-images/trustedkey/acme_logo.png" />
 		</div>
+		<p id="register_button"></p>
+
 		<p id="login_button"></p>
 	</div>
 
@@ -132,7 +150,10 @@
 	<hr>
 
 	<div id="info">
-		<p id="tk_sign-in-link"></p>
+		<p id="tk_register-link"></p>
+		<p id="tk_register_uri"></p>
+		<p id="register_button"></p>
+
 		<p id="tk_authorize_uri"></p>
 		<p id="user_info_msg"></p>
 	</div>
