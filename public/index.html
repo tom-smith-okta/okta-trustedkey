@@ -9,6 +9,7 @@
 
 	<link rel="shortcut icon" href="https://www.okta.com/sites/all/themes/developer/favicon.ico" type="image/vnd.microsoft.icon" />
 
+	<!--Okta-->
 	<script
 	  src="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.6.0/js/okta-sign-in.min.js"
 	  type="text/javascript"></script>
@@ -18,17 +19,19 @@
 	  type="text/css"
 	  rel="stylesheet"/>
 
-	<!-- Theme file: Customize or replace this file if you want to override our default styles -->
-	<link
-	  href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/2.6.0/css/okta-theme.css"
-	  type="text/css"
-	  rel="stylesheet"/>
-
 	<!-- include jquery just for some simple UI elements -->
 	<script
 	  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
 	  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
 	  crossorigin="anonymous"></script>
+
+	<!--Bootstrap-->
+<!-- 	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" integrity="sha384-pjaaA8dDz/5BgdFUPX6M/9SUZv4d12SUPF0axWc+VRZkx5xU3daN+lYb49+Ax+Tl" crossorigin="anonymous"></script> -->
+
 
 	<script>
 
@@ -42,18 +45,16 @@
 
 	var params = {}
 
-	// external idp (outside okta)
-	// leave blank if you are just authenticating directly against okta
-	params.idp = ""
+	params.idp = "0oah35cb7sJD7Pjpr0h7" // TrustedKey
 	params.client_id = "0oah3438yvWWsk1sH0h7"
 	params.response_type = "id_token"
 	params.response_mode = "fragment"
-	params.scope = "openid"
-	params.redirect_uri = "http://localhost:4512/"
+	params.scope = "openid+profile+email"
+	params.redirect_uri = "http://localhost:4512"
 	params.state = "some_state"
 	params.nonce = "some_nonce"
 
-	var authorize_uri = get_authorize_uri(params)
+	var trusted_key_uri = get_authorize_uri(params)
 
 	function get_authorize_uri(params) {
 		var authorize_uri = baseUrl + "/oauth2/v1/authorize?"
@@ -72,27 +73,15 @@
 		return authorize_uri
 	}
 
-	console.log("the authorize uri is: " + authorize_uri)
-
-	// external IDP
-	// var authorize_uri = "https://trustedkey.oktapreview.com/oauth2/v1/authorize?idp=0oah35cb7sJD7Pjpr0h7&client_id={clientId}&response_type={responseType}&response_mode={responseMode}&scope={scopes}&redirect_uri={redirectUri}&state={state}&nonce={nonce}"
-	/***************************************************************************/
-
-	params.idp = "0oah35cb7sJD7Pjpr0h7" // TrustedKey
-	params.scope = "openid+profile+email"
-	params.redirect_uri = "https://trustedkey.oktapreview.com"
-
-	var trusted_key_uri = get_authorize_uri(params)
-
-
 	/***************************************************************************/
 
 	var signIn = new OktaSignIn({
 		baseUrl: baseUrl
-	});
+	})
 
 	window.onload = function() {
 
+		alert("the page loaded!")
 		signIn.session.get(function (res) {
 			// Session exists, show logged in state.
 			if (res.status === 'ACTIVE') {
@@ -104,6 +93,7 @@
 			}
 			// No session, or error retrieving the session. Render the Sign-In Widget.
 			else if (res.status === 'INACTIVE') {
+				console.log("The user does not have an Okta session.")
 
 				$("#sign-in-link").html("<a href='" + authorize_uri + "'>" + authorize_uri + "</a>")
 				$("#authorize_uri").html(authorize_uri)
@@ -126,17 +116,8 @@
 
 <body style = "text-align: center">
 
-	<div id="regular_auth">
-		<h1>regular auth</h1>
-		<p id="sign-in-link"></p>
-		<p id="authorize_uri"></p>
-
-	</div>
-
-<hr>
-
 	<div id="trusted_key_auth">
-		<h1>trustedkey auth</h1>
+		<img src = "https://s3.amazonaws.com/tom-smith-okta-demo-images/medtronic.png" />
 		<p id="tk_sign-in-link"></p>
 		<p id="tk_authorize_uri"></p>
 	</div>
