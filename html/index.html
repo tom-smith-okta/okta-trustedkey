@@ -70,7 +70,7 @@
 	params.state = "some_state"
 	params.nonce = "some_nonce"
 
-	var trusted_key_authn_uri = get_authn_uri(params)
+	var trusted_key_authn_uri = get_authorize_uri(params)
 
 	function get_authorize_uri(params) {
 		var authorize_uri = baseUrl + "/oauth2/v1/authorize?"
@@ -97,7 +97,6 @@
 
 	window.onload = function() {
 
-		console.log("the trusted_key_uri is: " + trusted_key_uri)
 		signIn.session.get(function (res) {
 			// Session exists, show logged in state.
 			if (res.status === 'ACTIVE') {
@@ -150,12 +149,19 @@
 	<hr>
 
 	<div id="info">
-		<p id="tk_register-link"></p>
-		<p id="tk_register_uri"></p>
-		<p id="register_button"></p>
+		<div id ="register">
+			<p id="tk_register-link"></p>
+			<p id="tk_register_uri"></p>
+			<p id="register_button"></p>
+		</div>
 
-		<p id="tk_authorize_uri"></p>
-		<p id="user_info_msg"></p>
+		<hr>
+
+		<div id = "authn">
+			<p id="tk_sign-in-link"></p>
+			<p id="tk_authorize_uri"></p>
+			<p id="user_info_msg"></p>
+		</div>
 	</div>
 
 </body>
