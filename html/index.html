@@ -41,36 +41,38 @@
 	<script>
 
 	/***************************************************************************/
-	// BASIC REQUIREMENT: UPDATE THIS EXAMPLE VALUE WITH YOUR OWN VALUE
 
-	// okta tenant
-	var baseUrl = "https://trustedkey.oktapreview.com"
+	var baseUrl = "{{OKTA_TENANT}}"
 
 	/***************************************************************************/
 
 	var params = {}
 
-	params.idp = "0oah35cb7sJD7Pjpr0h7" // TrustedKey
-	params.client_id = "0oah3438yvWWsk1sH0h7"
+	params.idp = "{{OKTA_IDP_REG}}" // TrustedKey reg
+	params.client_id = "{{OKTA_CLIENT_ID}}"
 	params.response_type = "id_token"
-	params.response_mode = "fragment"
+	params.response_mode = "form_post"
 	params.scope = "openid+profile+email"
-	params.redirect_uri = "{{REDIRECT_URI}}"
+	params.redirect_uri = "{{REDIRECT_URI}}/callback"
 	params.state = "some_state"
 	params.nonce = "some_nonce"
 
 	var trusted_key_reg_uri = get_authorize_uri(params)
 
-	params.idp = "0oah6eoqqsCX6Rfwi0h7" // TrustedKey authn
-	params.client_id = "0oah3438yvWWsk1sH0h7"
-	params.response_type = "id_token"
+	/*****************************************************/
+
+	params.idp = "{{OKTA_IDP_AUTHN}}" // TrustedKey authn
+
+	var trusted_key_authn_uri_post = get_authorize_uri(params)
+
+	/****************************************************/
+
 	params.response_mode = "fragment"
-	params.scope = "openid"
 	params.redirect_uri = "{{REDIRECT_URI}}"
-	params.state = "some_state"
-	params.nonce = "some_nonce"
 
 	var trusted_key_authn_uri = get_authorize_uri(params)
+
+	/****************************************************/
 
 	function get_authorize_uri(params) {
 		var authorize_uri = baseUrl + "/oauth2/v1/authorize?"
@@ -102,10 +104,21 @@
 			if (res.status === 'ACTIVE') {
 				console.log("User has an Okta session.")
 				console.dir(res)
-				var welcome_msg = "<h3>Welcome, " + res.login + "!</h3>"
+
+				var welcome_msg = "<p>You have an Okta session!</p>"
+
+				var email = "{{EMAIL}}"
+
+				if (email === "{{EMAIL}}") {}
+				else {
+					welcome_msg += "<h3>Welcome, " + email + "!</h3>"
+				}
+
+				welcome_msg += "<p>the Okta user_id is: " + res.login + "</p>"
+
 				var signout_msg = "<a class='btn btn-primary' href = '#' onclick='logout()'>Log out</a>"
+
 				$("#welcome").html(welcome_msg + signout_msg)
-				$("#user_info_msg").html("<p>check the url if you want to see the id token</p><p>check the browser console if you want to see the user object</p>")
 			}
 			// No session, or error retrieving the session.
 			else if (res.status === 'INACTIVE') {
@@ -115,18 +128,25 @@
 				$("#tk_register_uri").html(trusted_key_reg_uri)
 				$("#register_button").html('<a class="btn btn-primary" href="' + trusted_key_reg_uri + '" role="button">Register</a>')
 
-				$("#tk_sign-in-link").html("<p>login: <a href='" + trusted_key_authn_uri + "'>" + trusted_key_authn_uri + "</a></p>")
+				$("#tk_sign-in-link").html("<p>login (id_token->client): <a href='" + trusted_key_authn_uri + "'>" + trusted_key_authn_uri + "</a></p>")
 				$("#tk_authorize_uri").html(trusted_key_authn_uri)
-				$("#login_button").html('<a class="btn btn-primary" href="' + trusted_key_authn_uri + '" role="button">log in</a>')
+				$("#login_button").html('<a class="btn btn-primary" href="' + trusted_key_authn_uri + '" role="button">log in</a> id_token->client')
 
+				$("#tk_sign-in-link_post").html("<p>login (id_token->server): <a href='" + trusted_key_authn_uri_post + "'>" + trusted_key_authn_uri_post + "</a></p>")
+				$("#tk_authorize_uri_post").html(trusted_key_authn_uri_post)
+				$("#login_button_post").html('<a class="btn btn-primary" href="' + trusted_key_authn_uri_post + '" role="button">log in</a> id_token->server')
 			}
 		});
 	}
 
-	function logout() {
+	function logout () {
 		signIn.session.close(function (err) {
-			window.location.reload(true);
-		});
+			if (err) {
+				window.location.reload()
+				return
+			}
+			window.location.reload()
+		})
 	}
 
 	</script>
@@ -142,6 +162,9 @@
 		<p id="register_button"></p>
 
 		<p id="login_button"></p>
+
+		<p id="login_button_post"></p>
+
 	</div>
 
 	<div id="welcome"></div>
@@ -160,6 +183,14 @@
 		<div id = "authn">
 			<p id="tk_sign-in-link"></p>
 			<p id="tk_authorize_uri"></p>
+			<p id="user_info_msg"></p>
+		</div>
+
+		<hr>
+
+		<div id = "authn_post">
+			<p id="tk_sign-in-link_post"></p>
+			<p id="tk_authorize_uri_post"></p>
 			<p id="user_info_msg"></p>
 		</div>
 	</div>
